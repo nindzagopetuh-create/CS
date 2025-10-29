@@ -4,122 +4,97 @@ class Program
 {
     static void Main()
     {
-        Console.WriteLine();
+        Console.WriteLine("Информация о числовых типах в C#");
+        Console.WriteLine("================================\n");
 
-        // 1) Прямоугольник 5x5
-        Console.WriteLine("1)");
-        for (int i = 0; i < 5; i++)
-        {
-            for (int j = 0; j < 5; j++)
-            {
-                Console.Write("* ");
-            }
-            Console.WriteLine();
-        }
-        Console.WriteLine();
+        // Целочисленные типы со знаком
+        PrintTypeInfo<sbyte>("sbyte");
+        PrintTypeInfo<short>("short");
+        PrintTypeInfo<int>("int");
+        PrintTypeInfo<long>("long");
 
-        // 2) Прямоугольный треугольник (возрастающий)
-        Console.WriteLine("2)");
-        for (int i = 1; i <= 5; i++)
-        {
-            for (int j = 1; j <= i; j++)
-            {
-                Console.Write("* ");
-            }
-            Console.WriteLine();
-        }
-        Console.WriteLine();
+        // Целочисленные типы без знака
+        PrintTypeInfo<byte>("byte");
+        PrintTypeInfo<ushort>("ushort");
+        PrintTypeInfo<uint>("uint");
+        PrintTypeInfo<ulong>("ulong");
 
-        // 3) Прямоугольный треугольник (убывающий)
-        Console.WriteLine("3)");
-        for (int i = 5; i >= 1; i--)
-        {
-            for (int j = 1; j <= i; j++)
-            {
-                Console.Write("* ");
-            }
-            Console.WriteLine();
-        }
-        Console.WriteLine();
+        // Типы с плавающей точкой
+        PrintTypeInfo<float>("float");
+        PrintTypeInfo<double>("double");
+        PrintTypeInfo<decimal>("decimal");
 
-        // 4) Треугольник со смещением вправо (убывающий)
-        Console.WriteLine("4)");
-        for (int i = 0; i < 5; i++)
-        {
-            for (int j = 0; j < i; j++)
-            {
-                Console.Write("  ");
-            }
-            for (int j = 0; j < 5 - i; j++)
-            {
-                Console.Write("* ");
-            }
-            Console.WriteLine();
-        }
-        Console.WriteLine();
+        // Символьный тип (технически не числовой, но часто используется с числами)
+        PrintTypeInfo<char>("char");
+    }
 
-        // 5) Треугольник со смещением вправо (возрастающий)
-        Console.WriteLine("5)");
-        for (int i = 0; i < 5; i++)
-        {
-            for (int j = 0; j < 4 - i; j++)
-            {
-                Console.Write("  ");
-            }
-            for (int j = 0; j <= i; j++)
-            {
-                Console.Write("* ");
-            }
-            Console.WriteLine();
-        }
-        Console.WriteLine();
+    static void PrintTypeInfo<T>(string typeName) where T : struct
+    {
+        Type type = typeof(T);
 
-        // 6) Ромб/песочные часы
-        Console.WriteLine("6)");
-        // Верхняя часть
-        for (int i = 0; i < 5; i++)
-        {
-            for (int j = 0; j < 4 - i; j++)
-            {
-                Console.Write(" ");
-            }
-            Console.Write("/");
-            for (int j = 0; j < i * 2; j++)
-            {
-                Console.Write(" ");
-            }
-            Console.Write("\\");
-            Console.WriteLine();
-        }
-        // Нижняя часть
-        for (int i = 0; i < 5; i++)
-        {
-            for (int j = 0; j < i; j++)
-            {
-                Console.Write(" ");
-            }
-            Console.Write("\\");
-            for (int j = 0; j < (4 - i) * 2; j++)
-            {
-                Console.Write(" ");
-            }
-            Console.Write("/");
-            Console.WriteLine();
-        }
+        Console.WriteLine($"Тип: {typeName}");
+        Console.WriteLine($"  Полное имя: {type.FullName}");
+        Console.WriteLine($"  Размер в байтах: {GetSize<T>()}");
+        Console.WriteLine($"  Минимальное значение: {GetMinValue<T>()}");
+        Console.WriteLine($"  Максимальное значение: {GetMaxValue<T>()}");
+        Console.WriteLine($"  Является примитивным: {type.IsPrimitive}");
+        Console.WriteLine($"  Является значением: {type.IsValueType}");
         Console.WriteLine();
+    }
 
-        // 7) Шахматная доска 5x5
-        Console.WriteLine("7)");
-        for (int i = 0; i < 5; i++)
+    static int GetSize<T>() where T : struct
+    {
+        return Type.GetTypeCode(typeof(T)) switch
         {
-            for (int j = 0; j < 5; j++)
-            {
-                if ((i + j) % 2 == 0)
-                    Console.Write("+ ");
-                else
-                    Console.Write("- ");
-            }
-            Console.WriteLine();
-        }
+            TypeCode.SByte or TypeCode.Byte => sizeof(sbyte),
+            TypeCode.Int16 or TypeCode.UInt16 => sizeof(short),
+            TypeCode.Int32 or TypeCode.UInt32 => sizeof(int),
+            TypeCode.Int64 or TypeCode.UInt64 => sizeof(long),
+            TypeCode.Single => sizeof(float),
+            TypeCode.Double => sizeof(double),
+            TypeCode.Decimal => sizeof(decimal),
+            TypeCode.Char => sizeof(char),
+            _ => 0
+        };
+    }
+
+    static string GetMinValue<T>() where T : struct
+    {
+        return Type.GetTypeCode(typeof(T)) switch
+        {
+            TypeCode.SByte => sbyte.MinValue.ToString(),
+            TypeCode.Byte => byte.MinValue.ToString(),
+            TypeCode.Int16 => short.MinValue.ToString(),
+            TypeCode.UInt16 => ushort.MinValue.ToString(),
+            TypeCode.Int32 => int.MinValue.ToString(),
+            TypeCode.UInt32 => uint.MinValue.ToString(),
+            TypeCode.Int64 => long.MinValue.ToString(),
+            TypeCode.UInt64 => ulong.MinValue.ToString(),
+            TypeCode.Single => float.MinValue.ToString("G"),
+            TypeCode.Double => double.MinValue.ToString("G"),
+            TypeCode.Decimal => decimal.MinValue.ToString(),
+            TypeCode.Char => ((int)char.MinValue).ToString(),
+            _ => "N/A"
+        };
+    }
+
+    static string GetMaxValue<T>() where T : struct
+    {
+        return Type.GetTypeCode(typeof(T)) switch
+        {
+            TypeCode.SByte => sbyte.MaxValue.ToString(),
+            TypeCode.Byte => byte.MaxValue.ToString(),
+            TypeCode.Int16 => short.MaxValue.ToString(),
+            TypeCode.UInt16 => ushort.MaxValue.ToString(),
+            TypeCode.Int32 => int.MaxValue.ToString(),
+            TypeCode.UInt32 => uint.MaxValue.ToString(),
+            TypeCode.Int64 => long.MaxValue.ToString(),
+            TypeCode.UInt64 => ulong.MaxValue.ToString(),
+            TypeCode.Single => float.MaxValue.ToString("G"),
+            TypeCode.Double => double.MaxValue.ToString("G"),
+            TypeCode.Decimal => decimal.MaxValue.ToString(),
+            TypeCode.Char => ((int)char.MaxValue).ToString(),
+            _ => "N/A"
+        };
     }
 }
