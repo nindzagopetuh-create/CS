@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntroductionToDOTNET", "IntroductionToDOTNET\IntroductionToDOTNET.csproj", "{BC7C6EB2-0A30-4F76-8516-949E0F18830F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Home_work", "Home_work\Home_work.csproj", "{3D6D9E8B-5E74-4CF0-A4D1-0C91D2BED856}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "calc", "calc\calc.csproj", "{393985EB-85C2-4EAF-87D0-73696B4B0B36}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{3D6D9E8B-5E74-4CF0-A4D1-0C91D2BED856}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D6D9E8B-5E74-4CF0-A4D1-0C91D2BED856}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D6D9E8B-5E74-4CF0-A4D1-0C91D2BED856}.Release|Any CPU.Build.0 = Release|Any CPU
+		{393985EB-85C2-4EAF-87D0-73696B4B0B36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{393985EB-85C2-4EAF-87D0-73696B4B0B36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{393985EB-85C2-4EAF-87D0-73696B4B0B36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{393985EB-85C2-4EAF-87D0-73696B4B0B36}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
