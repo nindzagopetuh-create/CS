@@ -16,6 +16,7 @@ namespace Calculator
             string expression = Console.ReadLine();
             // string expression = "22+33-44/2+8*3";
             // string expression = "(2+3)*4-10/2";
+            // string expression = "3+4*2/(1-5)^2";
 
             try
             {
@@ -32,10 +33,16 @@ namespace Calculator
 
         static double EvaluateExpression(string expression)
         {
+            if (string.IsNullOrWhiteSpace(expression))
+                throw new ArgumentException("Выражение не может быть пустым");
+
             // Удаляем пробелы и заменяем запятые на точки
             expression = expression.Replace(" ", "").Replace(",", ".");
 
-            // Используем стек для чисел и операций
+            // Обрабатываем отрицательные числа в начале выражения
+            if (expression[0] == '-')
+                expression = "0" + expression;
+
             Stack<double> numbers = new Stack<double>();
             Stack<char> operators = new Stack<char>();
 
@@ -43,17 +50,12 @@ namespace Calculator
             {
                 char current = expression[i];
 
-                // Если текущий символ - цифра или точка, извлекаем полное число
+                if (current == ' ') continue;
+
+                // Обработка чисел (включая десятичные)
                 if (char.IsDigit(current) || current == '.')
                 {
-                    string numberStr = "";
-                    while (i < expression.Length && (char.IsDigit(expression[i]) || expression[i] == '.'))
-                    {
-                        numberStr += expression[i];
-                        i++;
-                    }
-                    i--; // Возвращаемся на один символ назад
-
+                    string numberStr = ReadNumber(expression, ref i);
                     if (double.TryParse(numberStr, out double number))
                     {
                         numbers.Push(number);
@@ -63,36 +65,20 @@ namespace Calculator
                         throw new ArgumentException($"Неверный формат числа: {numberStr}");
                     }
                 }
-                // Если текущий символ - открывающая скобка, добавляем в стек операторов
+                // Обработка открывающей скобки
                 else if (current == '(')
                 {
                     operators.Push(current);
                 }
-                // Если текущий символ - закрывающая скобка, вычисляем выражение в скобках
+                // Обработка закрывающей скобки
                 else if (current == ')')
                 {
-                    while (operators.Count > 0 && operators.Peek() != '(')
-                    {
-                        numbers.Push(ApplyOperation(operators.Pop(), numbers.Pop(), numbers.Pop()));
-                    }
-
-                    if (operators.Count == 0)
-                    {
-                        throw new ArgumentException("Несбалансированные скобки");
-                    }
-
-                    operators.Pop(); // Удаляем открывающую скобку
+                    ProcessClosingBracket(numbers, operators);
                 }
-                // Если текущий символ - оператор
+                // Обработка операторов
                 else if (IsOperator(current))
                 {
-                    // Применяем операции с более высоким приоритетом
-                    while (operators.Count > 0 && HasHigherPrecedence(operators.Peek(), current))
-                    {
-                        numbers.Push(ApplyOperation(operators.Pop(), numbers.Pop(), numbers.Pop()));
-                    }
-
-                    operators.Push(current);
+                    ProcessOperator(current, numbers, operators);
                 }
                 else
                 {
@@ -101,12 +87,9 @@ namespace Calculator
             }
 
             // Применяем оставшиеся операции
-            while (operators.Count > 0)
-            {
-                numbers.Push(ApplyOperation(operators.Pop(), numbers.Pop(), numbers.Pop()));
-            }
+            ProcessRemainingOperations(numbers, operators);
 
-            if (numbers.Count != 1)
+            if (numbers.Count != 1 || operators.Count > 0)
             {
                 throw new ArgumentException("Неверное выражение");
             }
@@ -114,31 +97,137 @@ namespace Calculator
             return numbers.Pop();
         }
 
+        // Чтение числа из строки (оптимизированная версия)
+        static string ReadNumber(string expression, ref int index)
+        {
+            int start = index;
+            bool hasDecimalPoint = false;
+
+            while (index < expression.Length)
+            {
+                char c = expression[index];
+
+                if (char.IsDigit(c))
+                {
+                    index++;
+                }
+                else if (c == '.' && !hasDecimalPoint)
+                {
+                    hasDecimalPoint = true;
+                    index++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            string number = expression.Substring(start, index - start);
+            index--; // Корректируем индекс для основного цикла
+
+            return number;
+        }
+
+        // Обработка закрывающей скобки
+        static void ProcessClosingBracket(Stack<double> numbers, Stack<char> operators)
+        {
+            bool foundOpeningBracket = false;
+
+            while (operators.Count > 0 && operators.Peek() != '(')
+            {
+                if (numbers.Count < 2)
+                    throw new ArgumentException("Недостаточно операндов для операции");
+
+                numbers.Push(ApplyOperation(operators.Pop(), numbers.Pop(), numbers.Pop()));
+            }
+
+            if (operators.Count > 0 && operators.Peek() == '(')
+            {
+                operators.Pop(); // Удаляем открывающую скобку
+                foundOpeningBracket = true;
+            }
+
+            if (!foundOpeningBracket)
+                throw new ArgumentException("Несбалансированные скобки");
+        }
+
+        // Обработка операторов
+        static void ProcessOperator(char currentOperator, Stack<double> numbers, Stack<char> operators)
+        {
+            // Обработка отрицательных чисел после операторов или открывающих скобок
+            if (currentOperator == '-' && (operators.Count == 0 || operators.Peek() == '(') && numbers.Count == operators.Count)
+            {
+                // Это унарный минус, добавляем 0 в стек чисел
+                numbers.Push(0);
+            }
+
+            // Применяем операции с более высоким или равным приоритетом
+            while (operators.Count > 0 && operators.Peek() != '(' &&
+                   HasHigherOrEqualPrecedence(operators.Peek(), currentOperator))
+            {
+                if (numbers.Count < 2)
+                    throw new ArgumentException("Недостаточно операндов для операции");
+
+                numbers.Push(ApplyOperation(operators.Pop(), numbers.Pop(), numbers.Pop()));
+            }
+
+            operators.Push(currentOperator);
+        }
+
+        // Обработка оставшихся операций
+        static void ProcessRemainingOperations(Stack<double> numbers, Stack<char> operators)
+        {
+            while (operators.Count > 0)
+            {
+                if (operators.Peek() == '(')
+                    throw new ArgumentException("Несбалансированные скобки");
+
+                if (numbers.Count < 2)
+                    throw new ArgumentException("Недостаточно операндов для операции");
+
+                numbers.Push(ApplyOperation(operators.Pop(), numbers.Pop(), numbers.Pop()));
+            }
+        }
+
         static bool IsOperator(char c)
         {
             return c == '+' || c == '-' || c == '*' || c == '/';
         }
 
-        static bool HasHigherPrecedence(char op1, char op2)
+        static bool HasHigherOrEqualPrecedence(char op1, char op2)
         {
-            if (op1 == '(' || op1 == ')')
-                return false;
+            int priority1 = GetOperatorPriority(op1);
+            int priority2 = GetOperatorPriority(op2);
+            return priority1 >= priority2;
+        }
 
-            if ((op2 == '*' || op2 == '/') && (op1 == '+' || op1 == '-'))
-                return false;
-
-            return true;
+        static int GetOperatorPriority(char op)
+        {
+            switch (op)
+            {
+                case '+':
+                case '-':
+                    return 1;
+                case '*':
+                case '/':
+                    return 2;
+                default:
+                    return 0;
+            }
         }
 
         static double ApplyOperation(char operation, double b, double a)
         {
             switch (operation)
             {
-                case '+': return a + b;
-                case '-': return a - b;
-                case '*': return a * b;
+                case '+':
+                    return a + b;
+                case '-':
+                    return a - b;
+                case '*':
+                    return a * b;
                 case '/':
-                    if (b == 0)
+                    if (Math.Abs(b) < double.Epsilon)
                         throw new DivideByZeroException("Деление на ноль");
                     return a / b;
                 default:
@@ -147,4 +236,3 @@ namespace Calculator
         }
     }
 }
-
