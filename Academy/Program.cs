@@ -80,8 +80,7 @@ namespace Academy
                 }
             }
         }
-
-        // Метод для загрузки группы из файла (улучшенная версия)
+        // Метод для загрузки группы из файла
         static Human[] LoadGroupFromFile(string filename)
         {
             List<Human> group = new List<Human>();
@@ -104,7 +103,6 @@ namespace Academy
 
             return group.ToArray();
         }
-
         // Упрощенный парсинг с разделителями
         static Human ParseHumanFromDelimitedString(string data)
         {
