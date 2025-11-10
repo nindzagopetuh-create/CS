@@ -23,7 +23,7 @@ namespace Academy
                 new Graduate("Schreder", "Hank", 40,"Criminalistic", "OBN", 50, 60, "How to catch Heisenberg"),
                 new Student("Vercetty", "Tommy", 30, "Theft", "Vice", 98, 99),
                 new Teacher("Diaz", "Ricardo", 50, "Weapons distribution", 20),
-                new Teacher("Schwazenegger", "Arnold", 78, "Heavy Metal", 65)
+                new Teacher("Schwazenegger", "Arnold", 78,"Heavy Metal", 65)
             };
 
             Console.WriteLine(delimiter);
