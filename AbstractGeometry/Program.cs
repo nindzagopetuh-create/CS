@@ -74,13 +74,13 @@ namespace AbstractGeometry
                     string filename = "all_geometric_shapes.png";
                     bitmap.Save(filename, System.Drawing.Imaging.ImageFormat.Png);
 
-                    Console.WriteLine($"\n✅ Все фигуры успешно нарисованы и сохранены в '{filename}'");
-                    Console.WriteLine($"📍 Файл находится в: {Directory.GetCurrentDirectory()}");
+                    Console.WriteLine($"\nВсе фигуры успешно нарисованы и сохранены в '{filename}'");
+                    Console.WriteLine($" Файл находится в: {Directory.GetCurrentDirectory()}");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Ошибка: {ex.Message}");
+                Console.WriteLine($"Ошибка: {ex.Message}");
             }
 
             Console.WriteLine("\nНажмите любую клавишу для выхода...");
