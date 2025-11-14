@@ -8,13 +8,13 @@ using System.Windows.Forms;
 
 namespace AbstractGeometry
 {
-    class Circle : Shape
+    class Circle : Shape, IHaveDiameter
     {
         double radius;
         public double Radius
         {
             get => radius;
-            set => radius = FilterSize(value) / 2; // Радиус в 2 раза меньше диаметра
+            set => radius = FilterSize(value) / 2;
         }
 
         public Circle(double radius, int startX, int startY, int lineWidth, Color color)
@@ -25,6 +25,14 @@ namespace AbstractGeometry
 
         public override double GetArea() => Math.PI * Radius * Radius;
         public override double GetPerimeter() => 2 * Math.PI * Radius;
+
+        // Реализация IHaveDiameter
+        public double GetDiameter() => Radius * 2;
+
+        public void PrintDiameter()
+        {
+            Console.WriteLine($"Диаметр круга: {GetDiameter()}");
+        }
 
         public override void Draw(PaintEventArgs e)
         {
@@ -42,9 +50,9 @@ namespace AbstractGeometry
         {
             Console.WriteLine($"Круг:");
             Console.WriteLine($"  Радиус: {Radius}");
-            Console.WriteLine($"  Диаметр: {Radius * 2}");
             Console.WriteLine($"  Координаты центра: ({StartX + Radius}, {StartY + Radius})");
             base.Info(e);
+            PrintDiameter();
             Console.WriteLine();
         }
 

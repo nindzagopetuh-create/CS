@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace AbstractGeometry
 {
-    class Square : Shape
+    class Square : Shape, IHaveDiagonal, IHaveHeight
     {
         double side;
         public double Side
@@ -26,15 +26,33 @@ namespace AbstractGeometry
         public override double GetArea() => Side * Side;
         public override double GetPerimeter() => 4 * Side;
 
+        // Реализация IHaveDiagonal
+        public double GetDiagonal()
+        {
+            return Side * Math.Sqrt(2);
+        }
+
+        public void PrintDiagonal()
+        {
+            Console.WriteLine($"Диагональ квадрата: {GetDiagonal():F2}");
+        }
+
+        // Реализация IHaveHeight
+        public double GetHeight() => Side;
+
+        public void PrintHeight()
+        {
+            Console.WriteLine($"Высота квадрата: {Side}");
+        }
+
         public override void Draw(PaintEventArgs e)
         {
             Pen pen = new Pen(Color, LineWidth);
-            SolidBrush brush = new SolidBrush(Color.FromArgb(100, Color)); // Полупрозрачная заливка
+            SolidBrush brush = new SolidBrush(Color.FromArgb(100, Color));
 
             e.Graphics.DrawRectangle(pen, StartX, StartY, (float)Side, (float)Side);
             e.Graphics.FillRectangle(brush, StartX, StartY, (float)Side, (float)Side);
 
-            // Рисуем bounding box
             DrawBoundingBox(e);
         }
 
@@ -44,6 +62,8 @@ namespace AbstractGeometry
             Console.WriteLine($"  Сторона: {Side}");
             Console.WriteLine($"  Координаты: ({StartX}, {StartY})");
             base.Info(e);
+            PrintDiagonal();
+            PrintHeight();
             Console.WriteLine();
         }
 
