@@ -62,14 +62,6 @@ namespace AbstractGeometry
                     isosTriangle.Draw(e);
                     isosTriangle.Info(e);
 
-                    // Дополнительные фигуры
-                    Console.WriteLine("7. Дополнительные фигуры:");
-                    Square square2 = new Square(70, 50, 500, 2, Color.DarkRed);
-                    square2.Draw(e);
-
-                    Circle circle2 = new Circle(40, 400, 500, 2, Color.DarkGreen);
-                    circle2.Draw(e);
-
                     // Сохраняем результат
                     string filename = "all_geometric_shapes.png";
                     bitmap.Save(filename, System.Drawing.Imaging.ImageFormat.Png);
